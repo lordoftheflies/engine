@@ -108,17 +108,6 @@ Object.assign(pc, function () {
     var bMin = new pc.Vec3();
     var bMax = new pc.Vec3();
 
-    var setPropertyTarget;
-    var setPropertyOptions;
-
-    function setProperty(pName, defaultVal) {
-        if (setPropertyOptions[pName] !== undefined && setPropertyOptions[pName] !== null) {
-            setPropertyTarget[pName] = setPropertyOptions[pName];
-        } else {
-            setPropertyTarget[pName] = defaultVal;
-        }
-    }
-
     function pack3NFloats(a, b, c) {
         var packed = ((a * 255) << 16) | ((b * 255) << 8) | (c * 255);
         return (packed) / (1 << 24);
@@ -169,7 +158,6 @@ Object.assign(pc, function () {
 
         this._addTimeTime = 0;
 
-
         if (!ParticleEmitter.DEFAULT_PARAM_TEXTURE) {
             // White radial gradient
             var resolution = 16;
@@ -193,74 +181,71 @@ Object.assign(pc, function () {
             ParticleEmitter.DEFAULT_PARAM_TEXTURE.magFilter = pc.FILTER_LINEAR;
         }
 
-        // Global system parameters
-        setPropertyTarget = this;
-        setPropertyOptions = options;
-        setProperty("numParticles", 1);                          // Amount of particles allocated (max particles = max GL texture width at this moment)
+        this.initializeProperty("numParticles", options, 1);                          // Amount of particles allocated (max particles = max GL texture width at this moment)
 
         if (this.numParticles > graphicsDevice.maxTextureSize) {
             console.warn("WARNING: can't create more than " + graphicsDevice.maxTextureSize + " particles on this device.");
             this.numParticles = graphicsDevice.maxTextureSize;
         }
 
-        setProperty("rate", 1);                                  // Emission rate
-        setProperty("rate2", this.rate);
-        setProperty("lifetime", 50);                             // Particle lifetime
-        setProperty("emitterExtents", new pc.Vec3(0, 0, 0));        // Spawn point divergence
-        setProperty("emitterRadius", 0);
-        setProperty("emitterShape", pc.EMITTERSHAPE_BOX);
-        setProperty("initialVelocity", 1);
-        setProperty("wrap", false);
-        setProperty("localSpace", false);
-        setProperty("wrapBounds", null);
-        setProperty("colorMap", ParticleEmitter.DEFAULT_PARAM_TEXTURE);
-        setProperty("normalMap", null);
-        setProperty("loop", true);
-        setProperty("preWarm", false);
-        setProperty("sort", pc.PARTICLESORT_NONE); // Sorting mode: 0 = none, 1 = by distance, 2 = by life, 3 = by -life;  Forces CPU mode if not 0
-        setProperty("mode", pc.PARTICLEMODE_GPU);
-        setProperty("scene", null);
-        setProperty("lighting", false);
-        setProperty("halfLambert", false);
-        setProperty("intensity", 1.0);
-        setProperty("stretch", 0.0);
-        setProperty("alignToMotion", false);
-        setProperty("depthSoftening", 0);
-        setProperty("mesh", null);                               // Mesh to be used as particle. Vertex buffer is supposed to hold vertex position in first 3 floats of each vertex
-                                                                 // Leave undefined to use simple quads
-        setProperty("depthWrite", false);
-        setProperty("noFog", false);
-        setProperty("blendType", pc.BLEND_NORMAL);
-        setProperty("node", null);
-        setProperty("startAngle", 0);
-        setProperty("startAngle2", this.startAngle);
+        this.initializeProperty("rate", options, 1);                                  // Emission rate
+        this.initializeProperty("rate2", options, this.rate);
+        this.initializeProperty("lifetime", options, 50);                             // Particle lifetime
+        this.initializeProperty("emitterExtents", options, new pc.Vec3(0, 0, 0));        // Spawn point divergence
+        this.initializeProperty("emitterRadius", options, 0);
+        this.initializeProperty("emitterShape", options, pc.EMITTERSHAPE_BOX);
+        this.initializeProperty("initialVelocity", options, 1);
+        this.initializeProperty("wrap", options, false);
+        this.initializeProperty("localSpace", options, false);
+        this.initializeProperty("wrapBounds", options, null);
+        this.initializeProperty("colorMap", options, ParticleEmitter.DEFAULT_PARAM_TEXTURE);
+        this.initializeProperty("normalMap", options, null);
+        this.initializeProperty("loop", options, true);
+        this.initializeProperty("preWarm", options, false);
+        this.initializeProperty("sort", options, pc.PARTICLESORT_NONE); // Sorting mode: 0 = none, 1 = by distance, 2 = by life, 3 = by -life;  Forces CPU mode if not 0
+        this.initializeProperty("mode", options, pc.PARTICLEMODE_GPU);
+        this.initializeProperty("scene", options, null);
+        this.initializeProperty("lighting", options, false);
+        this.initializeProperty("halfLambert", options, false);
+        this.initializeProperty("intensity", options, 1.0);
+        this.initializeProperty("stretch", options, 0.0);
+        this.initializeProperty("alignToMotion", options, false);
+        this.initializeProperty("depthSoftening", options, 0);
+        this.initializeProperty("mesh", options, null);  // Mesh to be used as particle. Vertex buffer is supposed to hold vertex position in first 3 floats of each vertex
+                                                    // Leave undefined to use simple quads
+        this.initializeProperty("depthWrite", options, false);
+        this.initializeProperty("noFog", options, false);
+        this.initializeProperty("blendType", options, pc.BLEND_NORMAL);
+        this.initializeProperty("node", options, null);
+        this.initializeProperty("startAngle", options, 0);
+        this.initializeProperty("startAngle2", options, this.startAngle);
 
-        setProperty("animTilesX", 1);
-        setProperty("animTilesY", 1);
-        setProperty("animNumFrames", 1);
-        setProperty("animSpeed", 1);
-        setProperty("animLoop", true);
+        this.initializeProperty("animTilesX", options, 1);
+        this.initializeProperty("animTilesY", options, 1);
+        this.initializeProperty("animNumFrames", options, 1);
+        this.initializeProperty("animSpeed", options, 1);
+        this.initializeProperty("animLoop", options, true);
 
         this.frameRandom = new pc.Vec3(0, 0, 0);
 
         // Time-dependent parameters
-        setProperty("colorGraph", default1Curve3);
-        setProperty("colorGraph2", this.colorGraph);
+        this.initializeProperty("colorGraph", options, default1Curve3);
+        this.initializeProperty("colorGraph2", options, this.colorGraph);
 
-        setProperty("scaleGraph", default1Curve);
-        setProperty("scaleGraph2", this.scaleGraph);
+        this.initializeProperty("scaleGraph", options, default1Curve);
+        this.initializeProperty("scaleGraph2", options, this.scaleGraph);
 
-        setProperty("alphaGraph", default1Curve);
-        setProperty("alphaGraph2", this.alphaGraph);
+        this.initializeProperty("alphaGraph", options, default1Curve);
+        this.initializeProperty("alphaGraph2", options, this.alphaGraph);
 
-        setProperty("localVelocityGraph", default0Curve3);
-        setProperty("localVelocityGraph2", this.localVelocityGraph);
+        this.initializeProperty("localVelocityGraph", options, default0Curve3);
+        this.initializeProperty("localVelocityGraph2", options, this.localVelocityGraph);
 
-        setProperty("velocityGraph", default0Curve3);
-        setProperty("velocityGraph2", this.velocityGraph);
+        this.initializeProperty("velocityGraph", options, default0Curve3);
+        this.initializeProperty("velocityGraph2", options, this.velocityGraph);
 
-        setProperty("rotationSpeedGraph", default0Curve);
-        setProperty("rotationSpeedGraph2", this.rotationSpeedGraph);
+        this.initializeProperty("rotationSpeedGraph", options, default0Curve);
+        this.initializeProperty("rotationSpeedGraph2", options, this.rotationSpeedGraph);
 
         // Particle updater constants
         this.constantParticleTexIN = gd.scope.resolve("particleTexIN");
@@ -419,6 +404,13 @@ Object.assign(pc, function () {
     }
 
     Object.assign(ParticleEmitter.prototype, {
+        initializeProperty: function (propName, data, defaultValue) {
+            if (data[propName] !== undefined && data[propName] !== null) {
+                this[propName] = data[propName];
+            } else {
+                this[propName] = defaultValue;
+            }
+        },
 
         onChangeCamera: function () {
             this.regenShader();
