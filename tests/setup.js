@@ -4,3 +4,6 @@ window.test = QUnit.test.bind(QUnit);
 QUnit.skip = function(testName) {
     console.warn("Skipping test '" + testName + "'");
 };
+
+// TODO should be able to remove this if we update QUnit
+QUnit.dump = QUnit.jsDump;
